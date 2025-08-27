@@ -1,0 +1,124 @@
+#include <bits/stdc++.h>
+#include <iostream>
+using namespace std;
+
+//Target:
+//实现斐波那契数列
+
+//Part1:
+//递归
+int fib(int n)
+{
+	if(n<=1)
+		return n;
+	return fib(n-1)+fib(n-2);
+}
+//缺点:重复计算严重,即已经计算过的值并没有存储"记忆"起来,因而每次都要计算对应步骤的函数值,尽管这个函数值在之前的步骤中已经计算过了
+//时间复杂度:O(2^n)
+//comment:指数级,效率低
+
+//Part2:
+//记忆化搜索(自顶向下)
+#include <vector>
+int fibMemo(int n,vector<int>& memo)
+{
+	if(n<=1)
+		return n;
+	if(memo[n]!=-1)
+		return memo[n];//已经计算过了
+	//由下面的fib()函数可知,memo中的元素全部被初始化为-1
+	//每一个新的未计算过的memo[i]被计算出,原来的memo[i]中存储的-1值一定会被一个非-1值覆盖掉
+	//从而代表这个索引下的memo[i]的值被记忆
+	//可以直接被调用作为新的索引下的memo[j]计算步骤中的memo[i]值,这就避免了前面递归操作中的重复计算的问题
+	//即由于被计算过的memo[i]值被记忆下来了,
+	//从而在后续计算新的memo[j]值的过程中可以直接调用对应的memo[i]的值作为memo[j]计算过程中的一部分
+	//e.g.memo[j] = memo[i]+memo[k];
+	memo[n] = fibMemo(n-1,memo) + fibMemo(n-2,memo);
+	return memo[n];
+}
+
+int fib(int n)
+{
+	vector<int>memo(n+1,-1);//初始化为-1
+	return fibMemo(n,memo);
+}
+//时间复杂度:O(n)
+//空间复杂度:O(n)
+
+//Part3:
+//迭代递推
+//从最基础情况开始,逐步递推到目标:
+int fib(int n)
+{
+	if(n<=1)
+		return n;
+	vector<int>dp(n+1);
+	dp[0] = 0;
+	dp[1] = 1;
+	//初始化
+	for(int i=2;i<=n;i++)
+	{
+		dp[i] = dp[i-1] + dp[i-2];
+	}
+	return dp[n];
+}
+//优化空间:只保留前两个状态,空间O(1):
+int fib(int n)
+{
+	if(n<=1)
+		return n;
+	int a = 0;
+	int b = 1;
+	int c;
+	for(int i=2;i<=n;i++)
+	{
+		c = a + b;
+		a = b;
+		b = c;
+	}
+	return b;
+}
+
+
+//经典问题实战:
+//爬楼梯(LeetCode 70)
+//问题：每次爬1或2阶，到n阶有多少种方法
+//状态定义：dp[i]表示到第i阶的方法数
+//状态转移：dp[i] = dp[i-1] + dp[i-2] （从i-1爬1阶，或从i-2爬2阶）
+//初始化：dp[0]=1, dp[1]=1
+int climbStairs(int n) 
+{
+    if (n <= 1) 
+		return 1;
+    vector<int> dp(n+1);
+    dp[0] = 1; 
+	dp[1] = 1;
+    for (int i=2; i<=n; i++)
+        dp[i] = dp[i-1] + dp[i-2];
+    return dp[n];
+}
+//空间优化(类似斐波那契):
+int climbStairs(int n) 
+{
+    if (n <= 1) 
+		return 1;
+    int a = 1, b = 1, c;
+    for (int i=2; i<=n; i++) 
+	{
+        c = a + b;
+        a = b;
+        b = c;
+    }
+    return b;
+}
+
+
+
+//主函数:
+//int main()
+//{
+//	
+//	
+//	
+//	return 0;
+//}
